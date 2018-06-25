@@ -34,6 +34,10 @@ The changes should now all be in a temporary branch on GitHub, so all that remai
 to create a pull-request merging onto develop/agcm from out temporary branch.    The code owners
 for that branch will be notified and can accept the changes after the automated tests pass.
 
+If further development will continue in CVS, then it is strongly recommended that the resulting
+directory tree is brought back into CVS.   The details of this are beyond the scope of this page.
+
+
 
     
     
