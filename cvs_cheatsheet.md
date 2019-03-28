@@ -32,7 +32,7 @@ where `vim` is the example application used, but anything (`emacs`, Sublime Text
 |--|--|--|
 |Checkout the repository|`cvs checkout repo`|`git clone repo`|
 |Checkout a branch of the repo|`cvs checkout -r branch repo`|`git clone -b branch repo`|
-|Check the status|`cvs status`|`git status`|
+|Check the status|`cvs status`<br>and/or<br>`cvs -nq update`|`git status`|
 |Update the code checkout|`cvs update`|`git remote update`<br>`git pull`|
 |Commit changes|`cvs commit`|`git add`<br>`git commit`<br>(*optional*) `git push`|
 |Create a branch|`cvs tag -b branch-tag`|`git branch branchName`|
@@ -87,30 +87,80 @@ git pull
 which is actually two other commands. It does a `git fetch` which brings the remote changes to the local repository database and then `git merge` which merges those changes into the current checkout.
 
 ### Committing your code
+#### Single File
 
-   # CVS initial checkout                       # Git equivalent
-    
-    setenv CVSROOT ...                          git clone git@github.com:GoddardESM/GEOSsystem.git  GEOSagcm
-    cvs checkout GEOSagcm                       cd GEOSagcm
-                                                src/set_configuration.sh GEOSagcm
-                                                git checkout GEOSagcm
-                                                
-                                                # or 
-                                                
-                                                ggit GEOSagcm
+The process of committing your code in git is similar to CVS, but is a multi-step process.
 
+In CVS, if one has changed `file`, one would do:
+```
+cvs commit file
+```
+This causes an EDITOR to open and one enters in a commit message and then CVS commits the file to the remote repository. 
 
-    # CVS add new file                          # Git equivalent
-    cvs add [-m message] files                  git add files
+In git, however, because it is local-focused, has a different philosophy. Git understands files that have changed are either *unstaged* or *staged*. One first *stages* the changed file with:
 
+```
+git add file
+```
+This command, `git add` tells git that I want to stage this file for a commit. Then you commit the file:
+```
+git commit
+```
+(*Note*: No `file`!) An EDITOR opens and you add your message. At this point your *local* repository has this committed, but your remote does not know about it. In order to move the changes to the remote one does:
+```
+git push
+```
 
-    # CVS 
-                                                
-                                                
-                                                
-    
-                                                
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTkzOTY4MjIwMCwzNzk5NTI4MTIsLTEwMj
-Q2MTg4MjhdfQ==
--->
+#### Multiple File Commits
+In CVS, one can commit many files at once:
+```
+cvs commit file1 file2 file3
+```
+or you can do:
+```
+cvs commit
+```
+with no file, CVS will commit all files in that directory and its subdirectories that are changed.
+
+Git can do something similar, but one must be careful. In git, you *stage* multiple files by doing:
+```
+git add file1 file2 file3
+```
+Then when you run `git commit`, it will commit those files. Indeed, as git sees a repository as a whole you can do:
+```
+cd dirA
+git add file1
+cd ../dirB/dirC
+git add file2
+```
+and your next `git commit` will commit both files ***no matter where*** you are in the repository!
+
+Note that doing:
+```
+git add
+```
+will do nothing. Indeed, git will throw an error:
+```bash
+$ git add
+Nothing specified, nothing added.
+Maybe you wanted to say 'git add .'?
+```
+Note its suggestion. If one runs `git add .` this is much like `cvs commit` in that it will add ***ALL*** unstaged files in this directory and in its subdirectories. This can be
+
+#### Commit with message
+
+Note that both CVS and git allow one to commit with a message in one command without opening an EDITOR:
+```
+cvs commit -m "commit message" file
+git commit -m "commit message" file
+```
+#### Stage and Commit in One Step (Beware!)
+For the sake of completeness, git does have an ability to *stage* and *commit* in one command:
+```
+git commit -a -m "commit message" file
+```
+However, this can be dangerous. If one does:
+```
+git commit -a -m "commit message"
+```
+you will stage and commit all the changed files in the directory and all subdirectories which might not be what you want.
